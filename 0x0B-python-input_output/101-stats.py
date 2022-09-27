@@ -1,51 +1,40 @@
 #!/usr/bin/python3
 """
-Reads from standard input and computes metrics
+reads stdin line by line and computes metrics
 """
+import sys
 
-
-if __name__ == "__main__":
-    import sys
-
-    stdin = sys.stdin
-
-    c = 0
-    size = 0
-    vd = ['200', '301', '400', '401', '403', '404', '405', '500']
-    st = {}
-
-    try:
-        for line in stdin:
-            if c == 10:
-                print("File size: {}".format(size))
-                for i in sorted(st):
-                    print("{}: {}".format(i, st[i]))
-                c = 1
-            else:
-                c = c + 1
-
-            line = line.split()
-
+file_size = 0
+status_tally = {"200": 0, "301": 0, "400": 0, "401": 0,
+                "403": 0, "404": 0, "405": 0, "500": 0}
+i = 0
+try:
+    for line in sys.stdin:
+        tokens = line.split()
+        if len(tokens) >= 2:
+            a = i
+            if tokens[-2] in status_tally:
+                status_tally[tokens[-2]] += 1
+                i += 1
             try:
-                size = size + int(line[-1])
-            except (IndexError, ValueError):
-                pass
+                file_size += int(tokens[-1])
+                if a == i:
+                    i += 1
+            except:
+                if a == i:
+                    continue
+        if i % 10 == 0:
+            print("File size: {:d}".format(file_size))
+            for key, value in sorted(status_tally.items()):
+                if value:
+                    print("{:s}: {:d}".format(key, value))
+    print("File size: {:d}".format(file_size))
+    for key, value in sorted(status_tally.items()):
+        if value:
+            print("{:s}: {:d}".format(key, value))
 
-            try:
-                if line[-2] in vd:
-                    if st.get(line[-2], -1) == -1:
-                        st[line[-2]] = 1
-                    else:
-                        st[line[-2]] = st[line[-2]] + 1
-            except IndexError:
-                pass
-
-        print("File size: {}".format(size))
-        for i in sorted(st):
-            print("{}: {}".format(i, st[i]))
-
-    except KeyboardInterrupt:
-        print("File size: {}".format(size))
-        for i in sorted(st):
-            print("{}: {}".format(i, st[i]))
-        raise
+except KeyboardInterrupt:
+    print("File size: {:d}".format(file_size))
+    for key, value in sorted(status_tally.items()):
+        if value:
+            print("{:s}: {:d}".format(key, value))
