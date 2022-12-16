@@ -3,7 +3,7 @@
 fetches https://alx-intranet.hbtn.io/status
 """
 if __name__ == "__main__":
-    import urllib.request as request
+    import urllib.request as 
     with request.urlopen('https://alx-intranet.hbtn.io/status') as r:
         html = r.read()
         print('Body response:')
